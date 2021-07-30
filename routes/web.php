@@ -1,5 +1,9 @@
 <?php
+// DB::listen(function ($query) {
+//     var_dump($query->sql, $query->bindings);
+// });
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,10 +17,33 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// auth()->logout();
+// auth()->loginUsingId(1);
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+Route::get('/about', function () {
+    return 'welcome to about page';
+});
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::middleware('auth')->group(function () {
+    Route::get('/tweets', 'TweetController@index')->name('home');
+    Route::post('/tweets', 'TweetController@store');
+
+    Route::post('/tweets/{tweet}/like', 'TweetLikesController@store');
+    Route::delete('/tweets/{tweet}/like', 'TweetLikesController@destroy');
+
+    Route::post('/profiles/{user:username}/follow', 'FollowsController@store');
+    Route::get('/profiles/{user:username}/edit', 'ProfileController@edit')->middleware('can:edit,user');
+
+    Route::patch('/profiles/{user:username}', 'ProfileController@update')->middleware('can:edit,user');
+
+    Route::get('/explore', 'ExploreController');
+});
+
+Route::get('/profiles/{user:username}', 'ProfileController@show')->name('profile');
+
+
+Auth::routes();

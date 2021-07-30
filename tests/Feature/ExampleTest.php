@@ -18,4 +18,9 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_it_loads_the_about_page()
+    {
+        $this->get('/about')->assertSee('page');
+    }
 }
